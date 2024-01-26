@@ -31,7 +31,7 @@ def CalcI(Cel, Eo, MAC):
     # print(A_np[np.where(Cel > eps)])
 
     # same as benoit after multiplying by 100
-    M = sum(Cel[0][MeasuredEl] * Z_np[0][MeasuredEl] / A_np[0][MeasuredEl])
+    M = sum(Cel[MeasuredEl] * Z_np[0][MeasuredEl] / A_np[0][MeasuredEl])
 
     # print("M: ", M)
 
@@ -44,7 +44,7 @@ def CalcI(Cel, Eo, MAC):
     # print("sum", sum(Cel[0][MeasuredEl] * (Z_np[0][MeasuredEl] / A_np[0][MeasuredEl]) * lnJi))
     # print('M', M)
     #lnJ same as benoit
-    lnJ = sum(Cel[0][MeasuredEl] * (Z_np[0][MeasuredEl] / A_np[0][MeasuredEl]) * lnJi)/M
+    lnJ = sum(Cel[MeasuredEl] * (Z_np[0][MeasuredEl] / A_np[0][MeasuredEl]) * lnJi)/M
     J = math.exp(lnJ)  # in keV
 
     # print("Ji", Ji)
@@ -84,7 +84,7 @@ def CalcI(Cel, Eo, MAC):
 
     """ R """
     # Z_b_bar # scalar
-    Z_b_bar = pow(sum(Cel[0][MeasuredEl]*Z_np[0][MeasuredEl]**0.5), 2) # agreement with benoit
+    Z_b_bar = pow(sum(Cel[MeasuredEl]*Z_np[0][MeasuredEl]**0.5), 2) # agreement with benoit
     # eta bar
     eta_bar = 1.75 * pow(10, -3) * Z_b_bar + 0.37 * (1 - math.exp(-0.015 * pow(Z_b_bar, 1.3))) # in agreement with benoit
     # print('eta_bar', eta_bar)
@@ -110,12 +110,12 @@ def CalcI(Cel, Eo, MAC):
 
     # Phio
     phi0 = 1 + 3.3 * (1 - 1 / pow(Uo, r)) * pow(eta_bar, 1.2)
-    lnZ_bar_n = sum(Cel[0][MeasuredEl]*np.log(Z_np[0][MeasuredEl])) # scalar
+    lnZ_bar_n = sum(Cel[MeasuredEl]*np.log(Z_np[0][MeasuredEl])) # scalar
     Z_bar_n = np.exp(lnZ_bar_n) # scalar
     # Qo in agreement with benoit
     Qo = 1 - 0.535 * math.exp(-pow(21 / Z_bar_n, 1 / 2)) - 2.5 * pow(10, -4) * pow(Z_bar_n / 20,3.5)  # page 60 why 1/2 instead of 1.2!!!!!!!!!!!!!!!!!!!!!!!!!
     # Z bar
-    Z_bar = sum(Cel[0][MeasuredEl]*Z_np[0][MeasuredEl])
+    Z_bar = sum(Cel[MeasuredEl]*Z_np[0][MeasuredEl])
     # b
     b = 40/Z_bar
     """ Q """
@@ -181,9 +181,9 @@ def CalcI(Cel, Eo, MAC):
     # print("MAC * Cel", np.matmul(np.transpose(MAC), np.transpose(Cel[0])))
     MAC = np.transpose(MAC)
     MAC[MAC < 0] = 0 # cleaning
-    Cel[0][Cel[0] < 0] = 0
-    np.nan_to_num(Cel[0], copy=False, nan=0, posinf=0, neginf=0)
-    Chi = (MAC @ Cel[0].conj().transpose() * 1/math.sin(math.radians(theta))).conj().T # checked
+    Cel[Cel < 0] = 0
+    np.nan_to_num(Cel, copy=False, nan=0, posinf=0, neginf=0)
+    Chi = (MAC @ Cel.conj().transpose() * 1/math.sin(math.radians(theta))).conj().T # checked
     #print('Chi', Chi) # checked
 
     """ First part of the integral to get intensity from Zero to Rc eq.21 """
@@ -204,6 +204,6 @@ def CalcI(Cel, Eo, MAC):
 
     condition = np.reshape(MeasuredEl, (1,92))
     Intensity = np.zeros((1,92))
-    Intensity[condition] = np.reshape(Cel[0],(1,92))[condition]*(Int1[condition] + Int2[condition])
+    Intensity[condition] = np.reshape(Cel,(1,92))[condition]*(Int1[condition] + Int2[condition])
     # print("Intensity", Intensity) # checked
     return Intensity
