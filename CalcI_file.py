@@ -84,6 +84,7 @@ def CalcI(Cel, Eo, MAC):
 
     """ R """
     # Z_b_bar # scalar
+    print('Cel_MeasuredEl', Cel[MeasuredEl])
     Z_b_bar = pow(sum(Cel[MeasuredEl]*Z_np[0][MeasuredEl]**0.5), 2) # agreement with benoit
     # eta bar
     eta_bar = 1.75 * pow(10, -3) * Z_b_bar + 0.37 * (1 - math.exp(-0.015 * pow(Z_b_bar, 1.3))) # in agreement with benoit
